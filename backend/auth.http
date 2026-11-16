@@ -1,0 +1,77 @@
+# Autenticacion y autorizacion (Unidad 9) - extension REST Client de VS Code
+# El JWT viaja en la cookie HttpOnly access_token: REST Client la guarda y la envia sola.
+
+@base = http://localhost:8000/api/v1/auth
+
+### Registro publico (asigna el rol user) -> 201
+POST {{base}}/register
+Content-Type: application/json
+
+{
+  "nombre": "Ana",
+  "apellido": "Lopez",
+  "email": "ana@test.com",
+  "celular": "2804123456",
+  "password": "Clave1234"
+}
+
+### Registro con email repetido -> 409
+POST {{base}}/register
+Content-Type: application/json
+
+{
+  "nombre": "Ana",
+  "apellido": "Lopez",
+  "email": "ana@test.com",
+  "password": "Clave1234"
+}
+
+### Registro con datos invalidos (email y clave corta) -> 422
+POST {{base}}/register
+Content-Type: application/json
+
+{
+  "nombre": "Ana",
+  "apellido": "Lopez",
+  "email": "no-es-un-email",
+  "password": "corta"
+}
+
+### Login como admin (formulario OAuth2: username lleva el email) -> 200 + cookie
+POST {{base}}/token
+Content-Type: application/x-www-form-urlencoded
+
+username=admin@foodstore.com&password=Admin1234
+
+### Login como user -> 200 + cookie
+# POST {{base}}/token
+# Content-Type: application/x-www-form-urlencoded
+#
+# username=juan@foodstore.com&password=Juan1234!
+
+### Credenciales incorrectas -> 401
+POST {{base}}/token
+Content-Type: application/x-www-form-urlencoded
+
+username=admin@foodstore.com&password=otra
+
+### Usuario autenticado y sus roles vigentes -> 200 (401 sin sesion)
+GET {{base}}/me
+
+### Listado de usuarios, incluye desactivados (solo admin; 403 para user)
+GET {{base}}/admin/usuarios
+
+### Desactivar un usuario (borrado logico: completa deleted_at)
+POST {{base}}/admin/usuarios/2/desactivar
+
+### Activar un usuario (deleted_at vuelve a nulo)
+POST {{base}}/admin/usuarios/2/activar
+
+### Cierre de sesion: Set-Cookie que borra la cookie
+POST {{base}}/logout
+
+### Catalogos de solo lectura (GET; el resto responde 405)
+GET http://localhost:8000/api/v1/catalogos/roles
+
+###
+GET http://localhost:8000/api/v1/catalogos/estados-pedido

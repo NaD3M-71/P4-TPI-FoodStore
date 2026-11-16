@@ -1,0 +1,301 @@
+# Requiere sesion: ejecutar primero el login de auth.http (REST Client conserva la cookie)
+
+@baseUrl = http://localhost:8000
+
+### ===================== HEALTH =====================
+
+### Estado de la API
+GET {{baseUrl}}/health/
+
+### Estado de la base de datos
+GET {{baseUrl}}/health/db
+
+### ===================== UNIDADES DE MEDIDA (solo lectura) =====================
+
+### Listar unidades de medida (seed)
+GET {{baseUrl}}/unidades-medida/
+
+### Obtener unidad de medida por id
+GET {{baseUrl}}/unidades-medida/1
+
+### Unidad inexistente (404)
+GET {{baseUrl}}/unidades-medida/99
+
+### ===================== CATEGORIAS =====================
+
+### Listar categorias (paginado)
+GET {{baseUrl}}/categorias/?offset=0&limit=10
+
+### Filtrar por nombre (busqueda parcial)
+GET {{baseUrl}}/categorias/?nombre=beb
+
+### Incluir categorias eliminadas (borrado logico)
+GET {{baseUrl}}/categorias/?incluir_inactivos=true
+
+### Crear categoria (201)
+POST {{baseUrl}}/categorias/
+Content-Type: application/json
+
+{
+  "nombre": "Bebidas",
+  "descripcion": "Gaseosas, jugos y aguas"
+}
+
+### Crear categoria sin descripcion (queda como cadena vacia)
+POST {{baseUrl}}/categorias/
+Content-Type: application/json
+
+{
+  "nombre": "Comidas"
+}
+
+### Crear categoria con otro nombre para las pruebas
+POST {{baseUrl}}/categorias/
+Content-Type: application/json
+
+{
+  "nombre": "Postres",
+  "descripcion": "Dulces y helados"
+}
+
+### Nombre duplicado (409)
+POST {{baseUrl}}/categorias/
+Content-Type: application/json
+
+{
+  "nombre": "  bebidas ",
+  "descripcion": "Repetida"
+}
+
+### Nombre vacio o solo espacios (422)
+POST {{baseUrl}}/categorias/
+Content-Type: application/json
+
+{
+  "nombre": "   "
+}
+
+### Obtener categoria por id
+GET {{baseUrl}}/categorias/1
+
+### Categoria inexistente (404)
+GET {{baseUrl}}/categorias/99
+
+### Actualizar categoria (reemplazo total)
+PUT {{baseUrl}}/categorias/1
+Content-Type: application/json
+
+{
+  "nombre": "Bebidas frias",
+  "descripcion": "Gaseosas, jugos y aguas frias"
+}
+
+### Actualizar con nombre de otra categoria (409)
+PUT {{baseUrl}}/categorias/1
+Content-Type: application/json
+
+{
+  "nombre": "Comidas",
+  "descripcion": ""
+}
+
+### Actualizar categoria inexistente (404)
+PUT {{baseUrl}}/categorias/99
+Content-Type: application/json
+
+{
+  "nombre": "Nada",
+  "descripcion": ""
+}
+
+### Eliminar categoria (204, borrado logico)
+DELETE {{baseUrl}}/categorias/3
+
+### Eliminar categoria con productos asociados (409)
+DELETE {{baseUrl}}/categorias/1
+
+### Eliminar categoria inexistente (404)
+DELETE {{baseUrl}}/categorias/99
+
+### ===================== INGREDIENTES =====================
+
+### Crear ingrediente (201)
+POST {{baseUrl}}/ingredientes/
+Content-Type: application/json
+
+{
+  "nombre": "Harina",
+  "descripcion": "Harina de trigo 000"
+}
+
+### Crear otro ingrediente
+POST {{baseUrl}}/ingredientes/
+Content-Type: application/json
+
+{
+  "nombre": "Azucar"
+}
+
+### Listar ingredientes (paginado)
+GET {{baseUrl}}/ingredientes/?offset=0&limit=10
+
+### Obtener ingrediente por id
+GET {{baseUrl}}/ingredientes/1
+
+### Actualizar ingrediente
+PUT {{baseUrl}}/ingredientes/1
+Content-Type: application/json
+
+{
+  "nombre": "Harina 000",
+  "descripcion": "Harina de trigo"
+}
+
+### Eliminar ingrediente (204 si no lo usa ningun producto)
+DELETE {{baseUrl}}/ingredientes/2
+
+### ===================== PRODUCTOS =====================
+
+### Crear producto con categorias e ingredientes (201)
+# categoria_ids es obligatorio (al menos 1). La primera categoria es la principal.
+# ingredientes es opcional.
+POST {{baseUrl}}/productos/
+Content-Type: application/json
+
+{
+  "nombre": "Torta de chocolate",
+  "descripcion": "Torta casera",
+  "precio_base": 4500.50,
+  "imagenes_url": ["https://example.com/torta-1.jpg", "https://example.com/torta-2.jpg"],
+  "disponible": true,
+  "categoria_ids": [3, 2],
+  "ingredientes": [
+    { "ingrediente_id": 1, "cantidad": 0.5, "unidad_medida_id": 1 },
+    { "ingrediente_id": 2, "cantidad": 200, "unidad_medida_id": 2 }
+  ]
+}
+
+### Crear producto sin ingredientes (201)
+POST {{baseUrl}}/productos/
+Content-Type: application/json
+
+{
+  "nombre": "Coca Cola 1.5L",
+  "precio_base": 2500,
+  "categoria_ids": [1]
+}
+
+### Crear producto sin categoria_ids (422)
+POST {{baseUrl}}/productos/
+Content-Type: application/json
+
+{
+  "nombre": "Sin categoria",
+  "precio_base": 100
+}
+
+### Crear producto con categoria_ids vacio (422)
+POST {{baseUrl}}/productos/
+Content-Type: application/json
+
+{
+  "nombre": "Sin categoria",
+  "precio_base": 100,
+  "categoria_ids": []
+}
+
+### Crear producto con precio negativo (422)
+POST {{baseUrl}}/productos/
+Content-Type: application/json
+
+{
+  "nombre": "Precio invalido",
+  "precio_base": -10,
+  "categoria_ids": [1]
+}
+
+### Crear producto con categoria inexistente (404)
+POST {{baseUrl}}/productos/
+Content-Type: application/json
+
+{
+  "nombre": "Categoria inexistente",
+  "precio_base": 100,
+  "categoria_ids": [1, 99]
+}
+
+### Listar productos (paginado)
+GET {{baseUrl}}/productos/?offset=0&limit=10
+
+### Filtrar productos por nombre
+GET {{baseUrl}}/productos/?nombre=torta
+
+### Incluir productos eliminados
+GET {{baseUrl}}/productos/?incluir_inactivos=true
+
+### Obtener producto por id
+GET {{baseUrl}}/productos/1
+
+### Producto inexistente (404)
+GET {{baseUrl}}/productos/99
+
+### Actualizar producto SIN tocar relaciones (se conservan)
+PUT {{baseUrl}}/productos/1
+Content-Type: application/json
+
+{
+  "nombre": "Torta de chocolate grande",
+  "descripcion": "Torta casera de 12 porciones",
+  "precio_base": 6000,
+  "imagenes_url": ["https://example.com/torta-grande.jpg"],
+  "disponible": true
+}
+
+### Actualizar producto reemplazando categorias e ingredientes
+PUT {{baseUrl}}/productos/1
+Content-Type: application/json
+
+{
+  "nombre": "Torta de chocolate grande",
+  "descripcion": "Torta casera de 12 porciones",
+  "precio_base": 6000,
+  "imagenes_url": [],
+  "disponible": false,
+  "categoria_ids": [2],
+  "ingredientes": [
+    { "ingrediente_id": 1, "cantidad": 1, "unidad_medida_id": 1 }
+  ]
+}
+
+### Actualizar producto inexistente (404)
+PUT {{baseUrl}}/productos/99
+Content-Type: application/json
+
+{
+  "nombre": "Nada",
+  "precio_base": 1
+}
+
+### Eliminar producto (204, borrado logico + cascada de asociaciones)
+DELETE {{baseUrl}}/productos/2
+
+### Eliminar producto inexistente (404)
+DELETE {{baseUrl}}/productos/99
+
+### ============ RELACIONES N:M (solo consulta) ============
+# No hay POST/DELETE para asociar: se gestionan al crear/editar el producto.
+
+### Categorias de un producto
+GET {{baseUrl}}/productos/1/categorias
+
+### Ingredientes de un producto
+GET {{baseUrl}}/productos/1/ingredientes
+
+### Productos de una categoria
+GET {{baseUrl}}/categorias/2/productos
+
+### Relacion con producto inexistente (404)
+GET {{baseUrl}}/productos/99/categorias
+
+### Relacion con categoria inexistente (404)
+GET {{baseUrl}}/categorias/99/productos
