@@ -5,12 +5,14 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 from app.core.database import create_all_tables
+from app.modules.auth.router import router as auth_router
 
 # Se importan los modelos para que SQLModel conozca todas las tablas antes de crearlas
 from app.modules.categorias.models import Categoria  # noqa: F401
 from app.modules.pedidos.models import DetallePedido, Pedido  # noqa: F401
 from app.modules.productos.models import Producto  # noqa: F401
 from app.modules.usuarios.models import Usuario  # noqa: F401
+from app.modules.usuarios.router import router as usuarios_router
 
 
 @asynccontextmanager
@@ -31,4 +33,5 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Los routers se agregan con el prefijo /api/v1 a medida que se construye cada modulo.
+app.include_router(auth_router, prefix="/api/v1")
+app.include_router(usuarios_router, prefix="/api/v1")
