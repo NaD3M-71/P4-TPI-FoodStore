@@ -1,23 +1,14 @@
 import { useEffect } from 'react'
-import { useAuthStore } from '@/features/auth'
 import AppRouter from '@/routes/AppRouter'
-import Toast from '@/shared/components/Toast'
+import { useAuthStore } from '@/store/authStore'
 
-// App solo compone la aplicacion: verifica la sesion al iniciar y monta el router y el Toast
-function App() {
-  const checkAuth = useAuthStore((state) => state.checkAuth)
+export default function App() {
+  const checkSession = useAuthStore((s) => s.checkSession)
 
-  // Al iniciar (o recargar) se confirma la sesion con GET /auth/me
+  // Al iniciar o recargar se confirma la sesion con GET /auth/me
   useEffect(() => {
-    void checkAuth()
-  }, [checkAuth])
+    void checkSession()
+  }, [checkSession])
 
-  return (
-    <>
-      <AppRouter />
-      <Toast />
-    </>
-  )
+  return <AppRouter />
 }
-
-export default App

@@ -1,40 +1,30 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
-import { AdminUsersPage, LoginPage, RegisterPage } from '@/features/auth'
-import { CategoriesPage } from '@/features/categories'
-import { IngredientsPage } from '@/features/ingredients'
-import { ProductsPage } from '@/features/products'
-import Navbar from '@/shared/components/Navbar'
-import UnauthorizedPage from '@/shared/components/UnauthorizedPage'
+import LoginPage from '@/features/auth/pages/LoginPage'
+import RegisterPage from '@/features/auth/pages/RegisterPage'
+import HomePage from '@/pages/HomePage'
+import UnauthorizedPage from '@/pages/UnauthorizedPage'
+import { MainLayout } from '@/shared/layout/MainLayout'
 import ProtectedRoute from './ProtectedRoute'
 
-// Todas las rutas de la aplicacion se declaran aca
-function AppRouter() {
+export default function AppRouter() {
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
-      <Navbar />
-      <Routes>
+    <Routes>
+      <Route element={<MainLayout />}>
         {/* Publicas */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
-        {/* Cualquier usuario autenticado */}
+        {/* Usuario autenticado (cliente o admin) */}
         <Route element={<ProtectedRoute />}>
-          <Route path="/categories" element={<CategoriesPage />} />
-          <Route path="/products" element={<ProductsPage />} />
-          <Route path="/ingredients" element={<IngredientsPage />} />
+          <Route path="/" element={<HomePage />} />
         </Route>
 
-        {/* Solo admin */}
-        <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
-          <Route path="/admin/users" element={<AdminUsersPage />} />
-        </Route>
+        {/* Solo admin: las pantallas se agregan en el bloque 8 */}
+        <Route element={<ProtectedRoute allowedRoles={['admin']} />} />
 
-        <Route path="/" element={<Navigate to="/categories" replace />} />
-        <Route path="*" element={<Navigate to="/categories" replace />} />
-      </Routes>
-    </div>
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Route>
+    </Routes>
   )
 }
-
-export default AppRouter

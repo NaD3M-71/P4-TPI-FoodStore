@@ -1,35 +1,23 @@
-// Usuario autenticado que guarda el AuthStore. No incluye el token: viaja en la cookie HttpOnly.
-export interface UsuarioAuth {
+export type Rol = 'user' | 'admin'
+
+export interface Usuario {
   id: number
-  nombre: string
-  apellido: string
+  username: string
+  full_name: string
   email: string
-  roles: string[] // nombres de los roles vigentes (admin, user)
-}
-
-export interface LoginCredentials {
-  email: string
-  password: string
-}
-
-// Body de POST /api/v1/auth/register
-export interface RegisterData {
-  nombre: string
-  apellido: string
-  email: string
-  celular: string | null
-  password: string
-}
-
-// Respuesta de GET /api/v1/auth/me y de los endpoints de administracion de usuarios
-export interface UsuarioResponse extends UsuarioAuth {
-  celular: string | null
-  activo: boolean
+  role: Rol
+  disabled: boolean
   created_at: string
-  deleted_at: string | null
 }
 
-// Respuesta de POST /auth/token y /auth/logout
-export interface MensajeResponse {
-  mensaje: string
+export interface LoginData {
+  username: string
+  password: string
+}
+
+export interface RegisterData {
+  username: string
+  full_name: string
+  email: string
+  password: string
 }

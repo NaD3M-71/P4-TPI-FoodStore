@@ -1,40 +1,25 @@
-import Button from './ui/Button'
+import { Button } from '@/shared/ui/Button'
 
 interface PaginacionProps {
-  paginaActual: number
-  totalPaginas: number
-  totalRegistros: number
-  puedeAnterior: boolean
-  puedeSiguiente: boolean
-  onAnterior: () => void
-  onSiguiente: () => void
+  pagina: number
+  porPagina: number
+  total: number
+  onCambiar: (pagina: number) => void
 }
 
-// Botones de pagina anterior y siguiente. Los datos los da la tabla (TanStack Table).
-function Paginacion({
-  paginaActual,
-  totalPaginas,
-  totalRegistros,
-  puedeAnterior,
-  puedeSiguiente,
-  onAnterior,
-  onSiguiente,
-}: PaginacionProps) {
+export function Paginacion({ pagina, porPagina, total, onCambiar }: PaginacionProps) {
+  const totalPaginas = Math.max(1, Math.ceil(total / porPagina))
   return (
-    <div className="flex items-center justify-between border-t border-gray-200 px-4 py-3 text-sm text-gray-600 dark:border-gray-700 dark:text-gray-300">
-      <span>
-        Pagina {paginaActual} de {totalPaginas} ({totalRegistros} registros)
+    <div className="flex items-center justify-center gap-4 py-4">
+      <Button variante="secundario" disabled={pagina <= 1} onClick={() => onCambiar(pagina - 1)}>
+        Anterior
+      </Button>
+      <span className="text-sm text-gray-600">
+        Pagina {pagina} de {totalPaginas}
       </span>
-      <div className="flex gap-2">
-        <Button variant="outline" size="sm" onClick={onAnterior} disabled={!puedeAnterior}>
-          Anterior
-        </Button>
-        <Button variant="outline" size="sm" onClick={onSiguiente} disabled={!puedeSiguiente}>
-          Siguiente
-        </Button>
-      </div>
+      <Button variante="secundario" disabled={pagina >= totalPaginas} onClick={() => onCambiar(pagina + 1)}>
+        Siguiente
+      </Button>
     </div>
   )
 }
-
-export default Paginacion
