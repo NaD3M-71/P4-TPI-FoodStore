@@ -3,47 +3,32 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.categoria.router import router as categoria_router
-from app.core.database import create_db_and_tables
-from app.health.router import router as health_router
-from app.ingrediente.router import router as ingrediente_router
-from app.modules.catalogos.router import router as catalogos_router
-from app.modules.usuarios.router import router as usuarios_router
-from app.pedidos.router import router as pedidos_router
-from app.producto.router import router as producto_router
-from app.seed import run_seed
-from app.unidad_medida.router import router as unidad_medida_router
+from app.core.config import settings
+from app.core.database import create_all_tables
+
+# Se importan los modelos para que SQLModel conozca todas las tablas antes de crearlas
+from app.modules.categorias.models import Categoria  # noqa: F401
+from app.modules.pedidos.models import DetallePedido, Pedido  # noqa: F401
+from app.modules.productos.models import Producto  # noqa: F401
+from app.modules.usuarios.models import Usuario  # noqa: F401
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    create_db_and_tables()
-    run_seed()
+    create_all_tables()
     yield
 
 
-app = FastAPI(title="API Catalogo de Productos", lifespan=lifespan)
+app = FastAPI(title="Food Store API", lifespan=lifespan)
 
-# CORS con credenciales: el navegador acepta y envia la cookie HttpOnly desde el frontend.
-# Con allow_credentials=True los origenes deben ser explicitos (no se admite "*").
+# CORS con credenciales: el navegador envia la cookie HttpOnly desde el frontend.
+# Con allow_credentials=True el origen debe ser explicito (no se admite "*").
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=[settings.FRONTEND_ORIGIN],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-app.include_router(usuarios_router)
-app.include_router(catalogos_router)
-app.include_router(categoria_router)
-app.include_router(producto_router)
-app.include_router(ingrediente_router)
-app.include_router(pedidos_router)
-app.include_router(unidad_medida_router)
-app.include_router(health_router)
-
-
-@app.get("/")
-def raiz():
-    return {"mensaje": "API funcionando. Documentacion en /docs"}
+# Los routers se agregan con el prefijo /api/v1 a medida que se construye cada modulo.
