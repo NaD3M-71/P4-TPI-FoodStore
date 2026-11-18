@@ -5,7 +5,7 @@ Trabajo Práctico Integrador de Programación 4 (UTN, Tecnicatura Universitaria 
 Aplicación web para un negocio de comidas: los clientes se registran, recorren el catálogo, arman un carrito y confirman pedidos; el administrador gestiona categorías, productos, stock, pedidos y usuarios desde un panel.
 
 - Repositorio: https://github.com/NaD3M-71/P4-TPI-FoodStore
-- Video de demostración: (link pendiente)
+- Video de demostración: https://drive.google.com/file/d/1JeXeSqsdZIzUcDR15yi4MW1Vxbp8q9lf/view?usp=sharing
 
 ## Tecnologías
 
