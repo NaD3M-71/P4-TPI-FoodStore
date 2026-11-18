@@ -12,11 +12,29 @@ Aplicación web para un negocio de comidas: los clientes se registran, recorren 
 - Backend: FastAPI, SQLModel, PostgreSQL, JWT en cookie HttpOnly, bcrypt.
 - Frontend: React 19, TypeScript, Vite, Tailwind CSS, TanStack Query, TanStack Form, TanStack Table, React Router, Zustand, Axios.
 
+## Funcionalidades
+
+Cliente:
+
+- Registro e inicio de sesión (la sesión se guarda en una cookie HttpOnly).
+- Catálogo con paginación, búsqueda y filtro por categoría.
+- Carrito persistente, checkout y confirmación de pedido.
+- Mis pedidos con detalle y cancelación mientras el pedido está pendiente.
+
+Administrador:
+
+- Resumen de pedidos e ingresos.
+- ABM de categorías y productos, con edición de stock y disponibilidad.
+- Gestión de pedidos: filtro por estado y cambio de estado (PENDIENTE, EN_PREPARACION, ENTREGADO, CANCELADO).
+- Activar y desactivar usuarios.
+
+Reglas de negocio principales: el pedido se crea de forma atómica descontando el stock y copiando nombre y precio de cada producto; al cancelar se devuelve el stock; los estados siguen una máquina de transiciones válidas; un cliente solo ve y cancela sus propios pedidos.
+
 ## Estructura
 
 ```
 backend/    API REST (FastAPI) bajo /api/v1
-frontend/   Aplicación React
+frontend/   Aplicación React (arquitectura por features: auth, products, categories, cart, orders, admin)
 ```
 
 ## Requisitos
